@@ -216,9 +216,7 @@ def main(args):
 
         if not args.keep:
             tqdm.write("Removing intermediary artifacts...")
-            files = scan(args.output_dir, "**/*_full.csv")
-            files = scan(args.output_dir, "**/channel_*.csv", True)
-            files += scan(args.output_dir, "**/track_*.csv", True)
+            files = scan(args.output_dir, "**/*.csv", True)
             files = [f["path"] for f in files]
             for e in tqdm(worker_pool.imap_unordered(remove, files), total=len(files), unit="files"):
                 if e:
