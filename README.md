@@ -17,7 +17,19 @@ $ pip install -r requirements.txt
 
 ## Usage
 ```
-$ python split.py -i input_dir/ -o output_dir/
+$ banana-split.py [-h] -i dir -o dir [-t N] [-k] [-v]
+
+Split MIDI files into channels and tracks.
+
+optional arguments:
+  -h, --help            show this help message and exit
+  -i dir, --input dir   (required) The folder containing the input data
+  -o dir, --output dir  (required) The folder containing the output data
+  -t N, --threads N     The amount of threads to use (default: local core count)
+  -k, --keep            When given, will keep the intermediary product of each
+                        file conversion (.csv)
+  -v, --verbose         When given, will produce more verbose output for
+                        debugging purposes
 ```
 
 
