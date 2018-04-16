@@ -13,3 +13,4 @@ time_signature_pattern = re.compile(r'(\d+),\s*(\d+),\s*(Time_signature),\s*(\d+
 unknown_event_pattern = re.compile(r'(\d+),\s*(\d+),\s*(Unknown_meta_event),.*')
 sequencer_specific_pattern = re.compile(r'(\d+),\s*(\d+),\s*(Sequencer_specific),.*')
 system_exclusive_pattern = re.compile(r'(\d+),\s*(\d+),\s*(System_exclusive\w*),.*')
+program_change_pattern = re.compile(r'(\d+),\s*(\d+),\s*(Program_c),\s*(\d+),\s*(\d+)')
