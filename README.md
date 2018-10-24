@@ -2,7 +2,7 @@
 This script takes a folder of MIDI files and splits them by channel and track.
 
 ## Download
-* [v1.0.0](https://github.com/timwedde/banana-split/archive/v1.0.0.zip)
+* [1.1.0](https://github.com/timwedde/banana-split/archive/1.1.0.zip)
 * [Master Version](https://github.com/timwedde/banana-split/archive/master.zip)
 
 ## Installation
