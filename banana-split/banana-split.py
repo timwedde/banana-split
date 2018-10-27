@@ -15,6 +15,7 @@ from os.path import join, dirname, exists
 from signal import signal, SIGINT, SIG_IGN
 from multiprocessing import cpu_count, Pool
 
+
 def check(args):
     if not exists(args.input_dir):
         print("Input directory does not exist!")
@@ -29,6 +30,7 @@ def check(args):
         shutil.rmtree(args.output_dir)
     mkdir(args.output_dir)
 
+
 def __midi_to_csv(file_in, file_out):
     if args.verbose:
         process = run(["midicsv", file_in, file_out])
@@ -36,12 +38,14 @@ def __midi_to_csv(file_in, file_out):
         process = run(["midicsv", file_in, file_out], stderr=DEVNULL)
     return process.returncode
 
+
 def __csv_to_midi(file_in, file_out):
     if args.verbose:
         process = run(["csvmidi", file_in, file_out])
     else:
         process = run(["csvmidi", file_in, file_out], stderr=DEVNULL)
     return process.returncode
+
 
 def midi_to_csv(file):
     folder = join(args.output_dir, file["name"])
@@ -54,12 +58,14 @@ def midi_to_csv(file):
             return "Could not convert '{}'".format(file["name"])
     return None
 
+
 def csv_to_midi(file):
     midi_file = join(dirname(file["path"]), "{}.mid".format(file["name"]))
     code = __csv_to_midi(file["path"], midi_file)
     if code != 0 and args.verbose:
         return "An error occurred while converting '{}' in folder {}".format(file["name"], dirname(file["path"]))
     return None
+
 
 def list_channels(file):
     channels = set()
@@ -69,6 +75,7 @@ def list_channels(file):
             if m:
                 channels.add(m.group(1))
     return channels
+
 
 def split_channel(file, data, channel):
     file_out = join(dirname(file["path"]), "channel_{}.csv".format(channel))
@@ -81,8 +88,9 @@ def split_channel(file, data, channel):
                 if m.group(1) == channel:
                     f.write(line)
             else:
-                if not lyric_pattern.match(line): # skip lyrics
+                if not lyric_pattern.match(line):  # skip lyrics
                     f.write(line)
+
 
 def split_channels(file, channels):
     file_in = file["path"]
@@ -90,15 +98,17 @@ def split_channels(file, channels):
     for channel in channels:
         split_channel(file, data, channel)
 
+
 def extract_channels(file):
     channels = list_channels(file)
     split_channels(file, channels)
+
 
 def transpose(file):
     data = []
     with open(file["path"], "r", encoding="latin-1") as f:
         for line in f:
-            m= note_pattern.match(line)
+            m = note_pattern.match(line)
             if m:
                 if m.group(2) != drum_channel:
                     note = int(m.group(5)) + args.offset
@@ -113,6 +123,7 @@ def transpose(file):
         for line in data:
             f.write(line)
 
+
 def check_channel(file):
     file_in = file["path"]
     data = open(file_in, "r", encoding="latin-1").readlines()
@@ -120,6 +131,7 @@ def check_channel(file):
         if note_pattern.match(line):
             return
     remove(file_in)
+
 
 def list_tracks(file):
     tracks = set()
@@ -130,6 +142,7 @@ def list_tracks(file):
                 tracks.add(m.group(1))
     return tracks
 
+
 def split_track(file, data, track):
     folder = join(dirname(file["path"]), file["name"])
     file_out = join(folder, "track_{}.csv".format(track))
@@ -137,15 +150,16 @@ def split_track(file, data, track):
         mkdir(folder)
     with open(file_out, "w") as f:
         for line in data:
-            if comment_pattern.match(line): # skip comments
+            if comment_pattern.match(line):  # skip comments
                 continue
             m = track_pattern.match(line)
             if m:
                 if m.group(1) == track:
                     f.write(line)
             else:
-                if not lyric_pattern.match(line): # skip lyrics
+                if not lyric_pattern.match(line):  # skip lyrics
                     f.write(line)
+
 
 def split_tracks(file, tracks):
     file_in = file["path"]
@@ -155,9 +169,11 @@ def split_tracks(file, tracks):
         split_track(file, data, track)
     shutil.move(file["path"], channel_target)
 
+
 def extract_tracks(file):
     tracks = list_tracks(file)
     split_tracks(file, tracks)
+
 
 def clean(file):
     data = open(file["path"], "r", encoding="latin-1").readlines()
@@ -168,7 +184,11 @@ def clean(file):
             f.write(line)
 
 # TODO: load the file to be processed into RAM once, instead of reading it from disk multiple times to improve performance
-# Remove dependency of development version of python-midi (python3 branch) (pip install https://github.com/vishnubob/python-midi/archive/feature/python3.zip)
+# Remove dependency of development version of python-midi (python3 branch)
+# (pip install
+# https://github.com/vishnubob/python-midi/archive/feature/python3.zip)
+
+
 def main(args):
     with tqdm(total=(6 if args.keep else 7), unit="step") as bar:
         tqdm.write("Converting input data...")
@@ -227,11 +247,16 @@ def main(args):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Split MIDI files into channels and tracks.")
-    parser.add_argument("-i", "--input", type=str, dest="input_dir", required=True, metavar="dir", help="(required) The folder containing the input data")
-    parser.add_argument("-o", "--output", type=str, dest="output_dir", required=True, metavar="dir", help="(required) The folder containing the output data")
-    parser.add_argument("-t", "--threads", type=int, dest="num_threads", default=cpu_count(), metavar="N", help="The amount of threads to use (default: {})".format(cpu_count()))
-    parser.add_argument("-k", "--keep", dest="keep", action="store_true", help="When given, will keep the intermediary product of each file (.csv)")
-    parser.add_argument("-v", "--verbose", dest="verbose", action="store_true", help="When given, will produce more verbose output for debugging purposes")
+    parser.add_argument("-i", "--input", type=str, dest="input_dir", required=True,
+                        metavar="dir", help="(required) The folder containing the input data")
+    parser.add_argument("-o", "--output", type=str, dest="output_dir", required=True,
+                        metavar="dir", help="(required) The folder containing the output data")
+    parser.add_argument("-t", "--threads", type=int, dest="num_threads", default=cpu_count(),
+                        metavar="N", help="The amount of threads to use (default: {})".format(cpu_count()))
+    parser.add_argument("-k", "--keep", dest="keep", action="store_true",
+                        help="When given, will keep the intermediary product of each file (.csv)")
+    parser.add_argument("-v", "--verbose", dest="verbose", action="store_true",
+                        help="When given, will produce more verbose output for debugging purposes")
     args = parser.parse_args()
 
     original_sigint_handler = signal(SIGINT, SIG_IGN)
