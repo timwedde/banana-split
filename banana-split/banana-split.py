@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+### System ###
 import re
 import sys
 import time
@@ -7,13 +8,17 @@ import shutil
 import argparse
 from glob import glob
 from tqdm import tqdm
-from patterns import *
-from scanner import scan
-from subprocess import run, DEVNULL
 from os import mkdir, remove, listdir
 from os.path import join, dirname, exists
 from signal import signal, SIGINT, SIG_IGN
 from multiprocessing import cpu_count, Pool
+
+### py-midicsv ###
+import py_midicsv
+
+### Local ###
+from patterns import *
+from scanner import scan
 
 
 def check(args):
@@ -32,39 +37,38 @@ def check(args):
 
 
 def __midi_to_csv(file_in, file_out):
-    if args.verbose:
-        process = run(["midicsv", file_in, file_out])
-    else:
-        process = run(["midicsv", file_in, file_out], stderr=DEVNULL)
-    return process.returncode
+    with open(file_out, "w") as f:
+        csv_string = py_midicsv.midi_to_csv(file_in)
+        f.write(csv_string.getvalue())
 
 
 def __csv_to_midi(file_in, file_out):
-    if args.verbose:
-        process = run(["csvmidi", file_in, file_out])
-    else:
-        process = run(["csvmidi", file_in, file_out], stderr=DEVNULL)
-    return process.returncode
+    with open(file_in, "r") as f:
+        midi_object = py_midicsv.csv_to_midi(f.readlines())
+    with open(file_out, "wb") as f:
+        midi_writer = py_midicsv.FileWriter(f)
+        midi_writer.write(midi_object)
 
 
 def midi_to_csv(file):
     folder = join(args.output_dir, file["name"])
     csv_file = join(folder, "{}_full.csv".format(file["name"]))
     mkdir(folder)
-    code = __midi_to_csv(file["path"], csv_file)
-    if code != 0:
+    try:
+        __midi_to_csv(file["path"], csv_file)
+    except:
         shutil.rmtree(folder)
         if args.verbose:
             return "Could not convert '{}'".format(file["name"])
-    return None
 
 
 def csv_to_midi(file):
     midi_file = join(dirname(file["path"]), "{}.mid".format(file["name"]))
-    code = __csv_to_midi(file["path"], midi_file)
-    if code != 0 and args.verbose:
-        return "An error occurred while converting '{}' in folder {}".format(file["name"], dirname(file["path"]))
-    return None
+    try:
+        __csv_to_midi(file["path"], midi_file)
+    except:
+        if args.verbose:
+            return "An error occurred while converting '{}' in folder {}".format(file["name"], dirname(file["path"]))
 
 
 def list_channels(file):
@@ -185,8 +189,7 @@ def clean(file):
 
 # TODO: load the file to be processed into RAM once, instead of reading it from disk multiple times to improve performance
 # Remove dependency of development version of python-midi (python3 branch)
-# (pip install
-# https://github.com/vishnubob/python-midi/archive/feature/python3.zip)
+# (pip install  https://github.com/vishnubob/python-midi/archive/feature/python3.zip)
 
 
 def main(args):
