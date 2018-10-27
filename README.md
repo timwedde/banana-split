@@ -2,7 +2,7 @@
 This script takes a folder of MIDI files and splits them by channel and track.
 
 ## Download
-* [1.1.0](https://github.com/timwedde/banana-split/archive/1.1.0.zip)
+* [1.2.0](https://github.com/timwedde/banana-split/archive/1.2.0.zip)
 * [Master Version](https://github.com/timwedde/banana-split/archive/master.zip)
 
 ## Installation
@@ -35,8 +35,8 @@ optional arguments:
 
 
 ### Dependencies
-* [midicsv](http://www.fourmilab.ch/webtools/midicsv/)
-* [tqdm](https://pypi.python.org/pypi/tqdm)
+* [py_midicsv](https://pypi.org/project/py-midicsv/)
+* [tqdm](https://pypi.org/project/tqdm/)
 
 ## Contributors
 
