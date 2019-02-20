@@ -39,7 +39,7 @@ def check(args):
 def __midi_to_csv(file_in, file_out):
     with open(file_out, "w") as f:
         csv_string = py_midicsv.midi_to_csv(file_in)
-        f.write(csv_string.getvalue())
+        f.write("\n".join(csv_string))
 
 
 def __csv_to_midi(file_in, file_out):
