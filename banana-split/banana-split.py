@@ -50,7 +50,8 @@ def __csv_to_midi(file_in, file_out):
         midi_writer.write(midi_object)
 
 
-def midi_to_csv(file):
+def midi_to_csv(data):
+    args, file = data
     folder = join(args.output_dir, file["name"])
     csv_file = join(folder, "{}_full.csv".format(file["name"]))
     mkdir(folder)
@@ -196,6 +197,7 @@ def main(args):
     with tqdm(total=(6 if args.keep else 7), unit="step") as bar:
         tqdm.write("Converting input data...")
         files = scan(args.input_dir, "*.mid")
+        files = [(args, file) for file in files]
         for e in tqdm(worker_pool.imap_unordered(midi_to_csv, files), total=len(files), unit="files"):
             if e:
                 tqdm.write(e)
